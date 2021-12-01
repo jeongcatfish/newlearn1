@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
@@ -23,7 +24,7 @@ public class Account {
 
     private boolean emailVerified;
 
-    private String eamilCheckToken; //이메일 검증시 사용
+    private String emailCheckToken; //이메일 검증시 사용
 
     private LocalDateTime joinedAt;
 
@@ -42,9 +43,13 @@ public class Account {
     private boolean studyCreatedByEmail;
     private boolean studyCreatedByWeb;
 
-    private boolean studyEnrollResultByEmail;
-    private boolean studyEnrollResultByWeb;
+    private boolean studyEnrollmentResultByEmail;
+    private boolean studyEnrollmentResultByWeb;
 
     private boolean studyUpdatedByEmail;
     private boolean studyUpdatedByWeb;
+
+    public void generateEmailCheckToken() {
+        this.emailCheckToken = UUID.randomUUID().toString();
+    }
 }
