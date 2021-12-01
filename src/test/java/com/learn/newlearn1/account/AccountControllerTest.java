@@ -9,7 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,7 +31,9 @@ class AccountControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @MockBean
     JavaMailSender javaMailSender;
@@ -60,19 +64,30 @@ class AccountControllerTest {
     void signUpSubmit_with_correct_input() throws Exception {
         mockMvc.perform(post("/sign-up")
                         .param("nickname", "jeongmin")
-                        .param("email", "jeongcatfish@email.com")
+                        .param("email", "jeong@gmail.com")
                         .param("password", "12345678")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/"));
 //                .andExpect(authenticated().withUsername("jeongmin"));
 
-        assertTrue(accountRepository.existsByEmail("jeongcatfish@email.com"));
-//        Account account = accountRepository.findByEmail("keesun@email.com");
-//        assertNotNull(account);
-//        assertNotEquals(account.getPassword(), "12345678");
-//        assertNotNull(account.getEmailCheckToken());
-//        then(emailService).should().sendEmail(any(EmailMessage.class));
+        Account account = accountRepository.findByEmail("jeong@gmail.com");
+        assertNotNull(account);
+        assertNotEquals(account.getPassword(),"12345678");
+        assertTrue(accountRepository.existsByEmail("jeong@gmail.com"));
     }
+
+//    @DisplayName("패스워드 해싱 테스트")
+//    @Test
+//    public void passwordHasingTest(){
+//        String password = "1234";
+//        String hashedPassword = "";
+//
+//        hashedPassword = passwordEncoder.encode(password);
+//        String secondHashedPassword = passwordEncoder
+//                .encode(passwordEncoder.encode(password) + password);
+//
+//        assertEquals(hashedPassword,secondHashedPassword);
+//    }
 
 }
