@@ -15,8 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -55,7 +59,8 @@ class AccountControllerTest {
                 .param("password","123123123")
                 .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/sign-up"));
+                .andExpect(view().name("account/sign-up"))
+                .andExpect(unauthenticated());
     }
 
     @DisplayName("회원 가입 처리 - 입력값 정상")
@@ -67,7 +72,8 @@ class AccountControllerTest {
                         .param("password", "12345678")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/"));
+                .andExpect(view().name("redirect:/"))
+                .andExpect(authenticated());
 //                .andExpect(authenticated().withUsername("jeongmin"));
 
         Account account = accountRepository.findByEmail("jeong@gmail.com");
@@ -87,23 +93,46 @@ class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"));
     }
-    @DisplayName("인증 메일 확인 - 입력 값 정상")
-    @Test
-    void checkEmailToken_with_correct_input() throws Exception{
+//    @DisplayName("인증 메일 확인 - 입력 값 정상")
+//    @Test
+//    void checkEmailToken_with_correct_input() throws Exception{
+//
+//        Account account = Account.builder()
+//                        .email("jeong@gmail.com").password("123123213").nickname("JM").build();
+//
+//        Account newAccount = accountRepository.save(account);
+//        newAccount.generateEmailCheckToken();
+//        newAccount.setJoinedAt(LocalDateTime.now());
+//
+//        mockMvc.perform(get("/check-email-token")
+//                        .param("token",newAccount.getEmailCheckToken())
+//                        .param("email",newAccount.getEmail())
+//                        .with(csrf()))
+//                .andExpect(status().isOk())
+//                .andExpect(model().attributeDoesNotExist("error"));
+//    }
 
-        Account account = Account.builder()
-                        .email("jeong@gmail.com").password("123123213").nickname("JM").build();
-
-        Account newAccount = accountRepository.save(account);
-        newAccount.generateEmailCheckToken();
-
-
-        mockMvc.perform(get("/check-email-token")
-                        .param("token",newAccount.getEmailCheckToken())
-                        .param("email",newAccount.getEmail()))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeDoesNotExist("error"));
-    }
+//    @DisplayName("인증 메일 확인 - 입력값 정상")
+//    @Test
+//    void checkEmailToken() throws Exception {
+//        Account account = Account.builder()
+//                .email("test@email.com")
+//                .password("12345678")
+//                .nickname("keesun")
+//                .build();
+//        Account newAccount = accountRepository.save(account);
+//        newAccount.generateEmailCheckToken();
+//
+//        mockMvc.perform(get("/check-email-token")
+//                        .param("token", newAccount.getEmailCheckToken())
+//                        .param("email", newAccount.getEmail()))
+//                .andExpect(status().isOk())
+//                .andExpect(model().attributeDoesNotExist("error"))
+//                .andExpect(model().attributeExists("nickname"))
+//                .andExpect(model().attributeExists("numberOfUser"))
+//                .andExpect(view().name("account/checked-email"))
+//                .andExpect(authenticated().withUsername("keesun"));
+//    }
 
     @DisplayName("패스워드 해싱 테스트")
     @Test

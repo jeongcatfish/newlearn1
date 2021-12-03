@@ -40,31 +40,53 @@ public class AccountController {
             return "account/sign-up";
         }
 
-        accountService.processNewAccount(signUpForm);
+        Account account = accountService.processNewAccount(signUpForm);
+        accountService.login(account);
 
         return "redirect:/";
     }
 
-    @GetMapping("/check-email-token")
-    public String checkEmailToken(String token, String email, Model model){
+//    @GetMapping("/check-email-token")
+//    public String checkEmailToken(String token, String email, Model model){
+//
+//        Account account = accountRepository.findByEmail(email);
+//        String view = "account/checked-email";
+//
+//        if(account == null){
+//            model.addAttribute("error","wrong_email");
+//            return view;
+//        }
+//
+//        if(!account.isValidToken(token)){
+//            model.addAttribute("error","w");
+//            return view;
+//        }
+//        account.completeSignUp();
+//        accountService.login(account);
+//        model.addAttribute("numberOfUser", accountRepository.count());
+//        model.addAttribute("nickname", account.getNickname());
+//
+//        return view;
+//    }
 
+    @GetMapping("/check-email-token")
+    public String checkEmailToken(String token, String email, Model model) {
         Account account = accountRepository.findByEmail(email);
         String view = "account/checked-email";
-
-        if(account == null){
-            model.addAttribute("error","wrong_email");
+        if (account == null) {
+            model.addAttribute("error", "wrong.email");
             return view;
         }
 
-        if(!account.getEmailCheckToken().equals(token)){
-            model.addAttribute("error","w");
+        if (!account.isValidToken(token)) {
+            model.addAttribute("error", "wrong.token");
             return view;
         }
         account.completeSignUp();
-
+        accountService.login(account);
+//        accountService.completeSignUp(account);
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
-
         return view;
     }
 
