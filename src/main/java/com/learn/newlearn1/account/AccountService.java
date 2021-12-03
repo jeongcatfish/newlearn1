@@ -6,6 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +15,7 @@ public class AccountService {
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public void processNewAccount(SignUpForm signUpForm) {
         Account newAccount = saveNewAccount(signUpForm);
         newAccount.generateEmailCheckToken();
@@ -37,7 +39,7 @@ public class AccountService {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(newAccount.getEmail());
         simpleMailMessage.setSubject("회원 가입 인증 메일");
-        simpleMailMessage.setText("/check-email-toekn?token="+ newAccount.getEmailCheckToken()+
+        simpleMailMessage.setText("/check-email-token?token="+ newAccount.getEmailCheckToken()+
                 "&email="+ newAccount.getEmail());
         javaMailSender.send(simpleMailMessage);
     }

@@ -1,12 +1,7 @@
 package com.learn.newlearn1.account;
 
-import com.learn.newlearn1.ConsoleMailSender;
 import com.learn.newlearn1.domain.Account;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -65,14 +60,15 @@ public class AccountController {
             model.addAttribute("error","w");
             return view;
         }
+        account.completeSignUp();
 
-        account.setEmailVerified(true);
-        account.setJoinedAt(LocalDateTime.now());
-        model.addAttribute("numberOfuser", accountRepository.count());
+        model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
 
         return view;
     }
+
+
 
     @GetMapping("/fag")
     public String fag(){
